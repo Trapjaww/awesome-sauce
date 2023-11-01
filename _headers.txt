@@ -1,2 +1,0 @@
-/protected/*
-  Basic-Auth: USERNAME:john SECOND_USERNAME:green
