@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title> Securly Blacklisted Phrases Checker </title>
+        <meta charset='utf-8'>
+        <style>
+            #enterphrasehere {
+                width: 600px;
+                height: 400px;
+                resize: none;
+            }
+            #results {
+                border: none;
+            }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        <script src="/scripts/analytics.js"></script>
+    </head>
+    <body>
+        <p>Note: Securly blacklists phrases both from searches and text messages.</p>
+        <textarea id="enterphrasehere" placeholder="Start typing"></textarea>
+        <div id="results">Nothing found yet...</div>
+        <script>
+            // Download phrases
+            const phraseMatchPassPhrase = "SeCuRlY@321$";
+            async function downloadPhrases() {
+                var data = await (await fetch("https://porthos.net/api/getProxy?url=http://cdn1.securly.com/pmatch.json")).text();
+                const t = CryptoJS.AES.decrypt(data, phraseMatchPassPhrase).toString(CryptoJS.enc.Utf8);
+                window.phraseMatchList = JSON.parse(t);
+            }
+            downloadPhrases();
+            var resultsDiv = document.getElementById("results");
+            if (resultsDiv.innerHTML === "") {
+                resultsDiv.style.border = "none";
+                resultsDiv.innerHTML = "No results.";
+            }
+            function textInPhraseMatchList() {
+                var texta = document.getElementById("enterphrasehere").value;
+                var bullyArray = window.phraseMatchList.Bully;
+                var griefArray = window.phraseMatchList.Grief;
+                var violenceArray = window.phraseMatchList.Violence;
+                resultsDiv.style.display = "block";
+                resultsDiv.innerHTML = "";
+                for (var i in bullyArray) {
+                    if (texta.includes(bullyArray[i].Phrase)) {
+                        results.innerHTML += "<p><h3>Bullying</h3><br>Phrase: &quot;" + bullyArray[i].Phrase + "&quot;<br>Confidence rating: " + (bullyArray[i].Confidence === "eHigh" ? "Very High" : bullyArray[i].Confidence) + "<br>Urgency: " + (bullyArray[i].Urgency === "eHigh" ? "Very High" : bullyArray[i].Urgency) + "</p><hr>";
+                    }
+                }
+                for (var i in griefArray) {
+                    if (texta.includes(griefArray[i].Phrase)) {
+                        results.innerHTML += "<p><h3>Grief (self-harm)</h3><br>Phrase: &quot;" + griefArray[i].Phrase + "&quot;<br>Confidence rating: " + (griefArray[i].Confidence === "eHigh" ? "Very High" : griefArray[i].Confidence) + "<br>Urgency: " + (griefArray[i].Urgency === "eHigh" ? "Very High" : griefArray[i].Urgency) + "</p><hr>";
+                    }
+                }
+                for (var i in violenceArray) {
+                    if (texta.includes(violenceArray[i].Phrase)) {
+                        results.innerHTML += "<p><h3>Violence</h3><br>Phrase: &quot;" + violenceArray[i].Phrase + "&quot;<br>Confidence rating: " + (violenceArray[i].Confidence === "eHigh" ? "Very High" : violenceArray[i].Confidence) + "<br>Urgency: " + (violenceArray[i].Urgency === "eHigh" ? "Very High" : violenceArray[i].Urgency) + "</p><hr>";
+                    }
+                }
+                if (results.innerHTML.endsWith("<hr>")) {
+                    results.innerHTML = results.innerHTML.slice(0, -4);
+                }
+                if (resultsDiv.innerHTML) {
+                    resultsDiv.style.border = "1px solid black";
+                    resultsDiv.innerHTML = "<h2>Blacklisted phrases found!</h2>" + resultsDiv.innerHTML;
+                } else {
+                    resultsDiv.style.border = "none";
+                    resultsDiv.innerHTML = "No results.";
+                }
+            }
+            document.getElementById("enterphrasehere").onkeyup = textInPhraseMatchList;
+        </script>
+    </body>
+</html>
