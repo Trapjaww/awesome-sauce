@@ -26,6 +26,9 @@
   },
   "homepage": "https://github.com/franciscop/tokyochat#readme",
   "dependencies": {
-    "server": "^1.0.38"
+    "cookies": "^0.8.0",
+    "jquery": "^3.7.1",
+    "server": "^1.0.38",
+    "socket.io-client": "^4.7.2"
   }
 }
