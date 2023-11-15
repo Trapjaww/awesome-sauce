@@ -26,6 +26,6 @@
   },
   "homepage": "https://github.com/franciscop/tokyochat#readme",
   "dependencies": {
-    "server": "^1.0.0-beta.2"
+    "server": "^1.0.38"
   }
 }
