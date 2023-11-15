@@ -1,3 +1,0 @@
-services = [
-  { binding = "password", service = "studystuff"}
-]
