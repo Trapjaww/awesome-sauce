@@ -1,134 +1,118 @@
-gbajs3 -- A Browser Based Game Boy Advance Emulator
-======
+# SenBoy [![Build Status](https://travis-ci.org/Senryoku/SenBoy.svg?branch=master)](https://travis-ci.org/Senryoku/SenBoy) 
 
-This project is a Game Boy Advance emulator that is freely licensed and works in any modern browser without plugins.
+GameBoy (Color) emulator.
 
-It began as a re-skin of the [gbajs2](https://github.com/andychase/gbajs2) fork by andychase, but now supports both the [mGBA wasm](https://github.com/thenick775/mgba/tree/feature/wasm) core as well as gbajs, a pure javascript GBA core.
+Emulation still has a few quirks (see issues), but [compatibility](https://github.com/Senryoku/SenBoy/wiki/Compatibility) is pretty good. This was developed as a side project and is by no means finished or polished.
 
-This project was driven specifically by my need to play modern GBA rom hacks outside of desktop applications, without side loading or building through xcode.
+A web version compiled to javascript via emscripten is available at http://senryoku.github.io/SenBoyWeb/. 
 
-Use it online! <https://gba.nicholas-vancise.dev>
+## Screenshots
 
-Do not attempt to log into the server unless you are the server owner or an approved user, your IP may be banned.
+<img src="http://senryoku.github.io/data/img/SenBoy/SenBoy_Zelda_1.webp" width=350 /> <img src="http://senryoku.github.io/data/img/SenBoy/SenBoy_Kirby_1.webp" width=350 />
 
-## New Feature List
-* Golang server for logged-in user support
-* Nginx server for gbajs3 content
-* Fast Forward
-* Remappable Keyboard Bindings
-* Virtual Controls (Desktop/Mobile)
-* Movable desktop canvas and controls
-* Mobile UI support
-* Offline PWA Support
-* Functional Surface-level ASM debugger (gbajs only)
-* Save state support (mGBA only)
-* Cheat code support (mGBA only)
-* Interchangeable cores
-    * mGBA support (wasm based)
-    * gbajs support (pure javascript)
-* Admin UI
-* Postgres support
+<img src="http://senryoku.github.io/data/img/SenBoy/SenBoy_CustomBoot.webp" width=350 /> <img src="http://senryoku.github.io/data/img/SenBoy/SenBoy_Debug_1.webp" width=350 />
 
-## Existing Feature List
-- Both cores support realtime clock
-- For additional gbajs2 features:
-    - [Compatibility](https://github.com/andychase/gbajs2/wiki/Compatibility-List)
-    - [Emulator features](https://github.com/andychase/gbajs2)
-- For additional mGBA features:
-    - [mGBA wasm fork Readme](https://github.com/thenick775/mgba/tree/feature/wasm)
-    - [official mGBA Readme](https://github.com/mgba-emu/mgba)
+## Compilation
 
-## To Do
-* Debugger enhancements
-* Server enhancements
-    - request an account feature suite
-    - s3 backed file storage
-* Vite/React UI rewrite
+You will need a fairly recent compiler, meaning with C++14 and std::experimental::filesystem support. Compilation is manually being tested on Windows (MinGW) with g++ 6.1.0, but Linux with g++5 or more should be fine (see Travis CI). I have no way to test OSX, so if you know how to setup a OSX compiler fulfilling these constraints on Travis, please tell me!
 
+You will need CMake and a copy of SFML 2.X (see Dependencies). On Windows, or if you used a non standard install path, you may want to set the CMake variables `CMAKE_PREFIX_PATH` to where are stored the SFML libraries and `SFML_INCLUDE_DIR` to the folder containing the SFML headers (using cmake-gui or the command line). Once this done, this should be enough:
+````
+cmake .
+make
+````
+## Usage
 
-## Sample Screenshots
+SenBoy now have a basic GUI! Yay! Bring it up (or hide it) by pressing Escape or Enter.
 
-* Example Desktop
+You can also pass a rom path via the command line to run it :
+````
+./SenBoy path/to/the/rom [options]
+````
 
-<img src="./readme-graphics/gbajs3-desktop.png">
+Option			| Effect
+----------------|--------
+-d				| Start in debug mode
+-b				| Skip Boot ROM
+-s				| Disable sound
+--dmg 			| Force execution in original GameBoy mode
+--cgb 			| Force execution in GameBoy Color mode
 
-* Example Mobile
+Controls uses any connected Joystick, or the keyboard. There is no way to configure it !
+Values are hard coded to match a Xbox360/XboxOne controller and the keyboard uses the following mapping: 
 
-<img src="./readme-graphics/gbajs3-mobile-portrait.png" width="400px">
+Gameboy Button	| Keyboard Key
+----------------|--------------
+A				| F
+B				| G
+Select			| H
+Start			| J
+Up				| Up Arrow
+Down			| Down Arrow
+Left			| Left Arrow
+Right			| Right Arrow
+Turbo A			| V, X on Gamepad
+Turbo B			| B, Y on Gamepad
 
-<img src="./readme-graphics/gbajs3-mobile-landscape.png">
+When SenBoy is running, the following shortcuts are available:
 
-* Example Admin
+Key				| Action
+----------------|--------
+Escape/Enter	| Show/Hide GUI
+Backspace		| Reset
+Space			| Advance one instruction (in debug)
+M				| Toggle Real Speed
+RB (Joystick)   | Unlock framerate (hold)
+D 				| Toggle Debugging (Halt Execution)
+L				| Advance one frame
+N				| Clear all breakpoints
+P 				| Toggle Post-process (nothing)
+NumPad +		| Volume Up
+NumPad -		| Volume Down
+Alt+Enter  	 	| Toggle Fullscreen
+Ctrl+S   		| Save (saves RAM to disk)
+Ctrl+Q   		| Quit
 
-<img src="./readme-graphics/admin-desktop.png">
+## TODO
+* Joypad interrupts: These are rarely used so I pretty much forgot to fix my implementation. What games uses them?
+* Gameboy Color Mode
+  * DMG Games in CGB mode (Correct compatibility mode; some sprites disappears)
+* Application debugging (See Issues)
+* (Other Mappers? What popular games uses other mappers than MBC1/3/5?)
+* (Constant coding style...)
 
-## Getting Started
-* Requires an env file of the format:
-```
-# gbajs3
-ROM_PATH=./<local-server-rom-path>/
-SAVE_PATH=./<local-server-save-path>/
-CLIENT_HOST=https://<your-client-location>
-CERT_LOC=./<path to your certificate>
-KEY_LOC=./<path to your key>
+## Tests
 
-# admin
-ADMIN_APP_ID=<your unique alphanumeric app id>
+Blargg's cpu_instrs individual tests:
 
-# postgres
-PG_DB_HOST=<database host>
-PG_DB_USER=<databse user>
-PG_DB_PASSWORD=<databse user password>
-GBAJS_DB_NAME=<your gbajs3 database name, default `gbajs3`>
-ADMIN_DB_NAME=<your goadmin database name, default `goadmin`>
-PG_DB_PORT=<postgres db port, default 5432>
-PG_SSL_MODE=<pg ssl mode>
-PG_DATA_LOCATION=./<path to postgres persistent mountpoint>
-```
-* Run `cp .env.example .env` for local builds, then adjust values or add certs/required directories
-* Testing certificates can be created with:
-```
-openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.crt
-```
-* Run `docker-compose up --build` and your services will build and start
-* Admin UI can be found at `/admin`, default password for all admin users are `admin`, **please log in to the admin portal and change the default passwords immediately**
-* Golang api swagger UI can be found at `/api/documentation/`
+Test					| Status
+------------------------|--------
+01-special				| :white_check_mark: PASS
+02-interrupts			| :white_check_mark: PASS
+03-op sp,hl				| :white_check_mark: PASS
+04-op r,imm				| :white_check_mark: PASS
+05-op rp				| :white_check_mark: PASS
+06-ld r,r				| :white_check_mark: PASS
+07-jr,jp,call,ret,rst	| :white_check_mark: PASS
+08-misc instrs			| :white_check_mark: PASS
+09-op r,r				| :white_check_mark: PASS
+10-bit ops				| :white_check_mark: PASS
+11-op a,(hl)			| :white_check_mark: PASS
+instr_timing			| :white_check_mark: PASS
+01-read_timing			| :x: FAIL
+02-write_timing			| :x: FAIL
+03-modify_timing		| :x: FAIL
+interrupt_time			| :white_check_mark: PASS
+halt_bug				| :x: FAIL
 
-## License
-Original work by Endrift. Repo: (Archived / No longer maintained)
-https://github.com/endrift/gbajs
-Copyright © 2012 – 2013, Jeffrey Pfau
+SenBoy is NOT sub-instruction accurate.
 
-Original work by Endrift. Repo: (mGBA wasm base)
-https://github.com/endrift/mgba
-mGBA is Copyright © 2013 – 2018 Jeffrey Pfau. It is distributed under the [Mozilla Public License version 2.0](https://www.mozilla.org/MPL/2.0/). A full copy of the license is available at my [fork](https://github.com/thenick775/mgba).
+## Dependencies
+* [SFML 2.X](http://www.sfml-dev.org/) for graphical output and input handling.
+* [Gb_Snd_Emu-0.1.4](http://blargg.8bitalley.com/libs/audio.html#Gb_Snd_Emu) for sound emulation (Included).
+* [dear imgui](https://github.com/ocornut/imgui) (Included)
+* [imgui-sfml](https://github.com/eliasdaler/imgui-sfml) (Included)
 
-Original work by andychase. Repo: (gbajs2 base)
-https://github.com/andychase/gbajs2
-Copyright © 2020, Andrew Chase 
-
-Copyright © 2022 - 2023, Nicholas VanCise
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+## Thanks
+* http://gbdev.gg8.se/ for their awesome wiki.
+* Shay 'Blargg' Green for his tests roms, his Gb_Snd_Emu library and all his contributions to the emulation scene!
