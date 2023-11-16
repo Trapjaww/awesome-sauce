@@ -1112,12 +1112,6 @@ window.EJS_main = function(_0xa88a13, _0x17edbf, _0x2c1832) {
                         'loading-info': _0x449eac({
                             'loading-info': true
                         }),
-                        'ad': _0x449eac({
-                            'ad': true
-                        }),
-                        'close-ad': _0x449eac({
-                            'close-ad': true
-                        }),
                         'start-game': _0x449eac({
                             'start-game': true
                         }),
