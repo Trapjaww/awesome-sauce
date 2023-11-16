@@ -1,3 +1,17 @@
+(async function() {
+    var VERSION = 1.2;
+    if (window.location && ['localhost', '127.0.0.1'].includes(location.hostname)) {
+        fetch('https://raw.githack.com/ethanaobrien/emulatorjs/main/data/version.json').then(response => {
+            if (response.ok) {
+                response.text().then(body => {
+                    var version = JSON.parse(body);
+                    if (VERSION < version.current_version) {
+                        console.log('Using emulatorjs version ' + VERSION + ' but the newest version is ' + version.current_version + '\nopen https://github.com/ethanaobrien/emulatorjs to update');
+                    }
+                })
+            }
+        })
+    }
     var scriptTag = document.getElementsByTagName('script')[0]
     function loadScript(file) {
         return new Promise(function (resolve, reject) {
