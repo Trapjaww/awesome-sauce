@@ -21,30 +21,27 @@
 
         <script type="text/javascript">
             emujstypes = ["nds", "gb", "gbc", "gba"]
-            const gamename = new URLSearchParams(window.location.search).get('game')
-            const type = new URLSearchParams(window.location.search).get('type')
-            const zippedGames = ["nds", "gb", "gbc", "gba"]
 
             var previous = {game:gamename, type:type}
             localStorage.setItem('previous', JSON.stringify(previous))
 
-            if (emujstypes.includes(type)){
+            if (emujstypes.includes("gba")){
                 var div = document.createElement("div")
-                div.className = "game"
-                div.id = "game"
+                div.className = "/kirby-nightmare-in-dream-land.zip"
+                div.id = "/kirby-nightmare-in-dream-land.zip"
                 div.style = "margin:auto; width:1280px; height:960px; max-width:100%; max-height:90%;"
                 document.body.appendChild(div)
 
-                var directory = "games/";
-                var game = String(directory) + String(type) + "/" + String(gamename) + ".zip"
+
                 const type = "gba"
+                var game = "/kirby-nightmare-in-dream-land.zip"
 
                 EJS_oldCores = true;
                 EJS_startOnLoaded = true;
                 EJS_color = '#88c070'
                 EJS_player = '#game';
                 EJS_biosUrl = '';
-                EJS_gameUrl = 'kirby-nightmare-in-dream-land.zip'; // Url to Game rom
+                EJS_gameUrl = game; // Url to Game rom
                 EJS_core = type;
                 EJS_pathtodata = 'data/'; //path to all of the wasm and js files. MUST all be in the same directory!!
                 //EJS_AdUrl = '' //path to AD page
