@@ -1,116 +1,70 @@
 (async function() {
-    const folderPath = (path) => path.substring(0, path.length - path.split('/').pop().length);
-    let scriptPath = (typeof window.EJS_pathtodata === "string") ? window.EJS_pathtodata : folderPath((new URL(document.currentScript.src)).pathname);
-    if (!scriptPath.endsWith('/')) scriptPath+='/';
-    //console.log(scriptPath);
+    var VERSION = 1.2;
+    if (window.location && ['localhost', '127.0.0.1'].includes(location.hostname)) {
+        fetch('https://raw.githack.com/ethanaobrien/emulatorjs/main/data/version.json').then(response => {
+            if (response.ok) {
+                response.text().then(body => {
+                    var version = JSON.parse(body);
+                    if (VERSION < version.current_version) {
+                        console.log('Using emulatorjs version ' + VERSION + ' but the newest version is ' + version.current_version + '\nopen https://github.com/ethanaobrien/emulatorjs to update');
+                    }
+                })
+            }
+        })
+    }
+    var scriptTag = document.getElementsByTagName('script')[0]
     function loadScript(file) {
         return new Promise(function (resolve, reject) {
-            let script = document.createElement('script');
+            var script = document.createElement('script');
             script.src = function() {
-                if ('undefined' != typeof EJS_paths && typeof EJS_paths[file] === 'string') {
+                if ('undefined' != typeof EJS_paths && typeof EJS_paths[file] == 'string') {
                     return EJS_paths[file];
+                } else if ('undefined' != typeof EJS_pathtodata) {
+                    return EJS_pathtodata+file+'?v='+VERSION;
                 } else {
-                    return scriptPath+file;
+                    return file+'?v='+VERSION;
                 }
             }();
-            script.onload = resolve;
-            document.head.appendChild(script);
-        })
-    }
-    function loadStyle(file) {
-        return new Promise(function(resolve, reject) {
-            let css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.href = function() {
-                if ('undefined' != typeof EJS_paths && typeof EJS_paths[file] === 'string') {
-                    return EJS_paths[file];
-                } else {
-                    return scriptPath+file;
-                }
-            }();
-            css.onload = resolve;
-            document.head.appendChild(css);
-        })
-    }
-    
-    if (('undefined' != typeof EJS_DEBUG_XX && true === EJS_DEBUG_XX)) {
-        await loadScript('emulator.js');
-        await loadScript('nipplejs.js');
-        await loadScript('shaders.js');
-        await loadScript('storage.js');
-        await loadScript('gamepad.js');
-        await loadScript('GameManager.js');
-        await loadScript('socket.io.min.js');
-        await loadStyle('emulator.css');
-    } else {
-        await loadScript('emulator.min.js');
-        await loadStyle('emulator.min.css');
-        
-    }
-    const config = {};
-    config.gameUrl = window.EJS_gameUrl;
-    config.dataPath = scriptPath;
-    config.system = window.EJS_core;
-    config.biosUrl = window.EJS_biosUrl;
-    config.gameName = window.EJS_gameName;
-    config.color = window.EJS_color;
-    config.adUrl = window.EJS_AdUrl;
-    config.adMode = window.EJS_AdMode;
-    config.adTimer = window.EJS_AdTimer;
-    config.adSize = window.EJS_AdSize;
-    config.alignStartButton = window.EJS_alignStartButton;
-    config.VirtualGamepadSettings = window.EJS_VirtualGamepadSettings;
-    config.buttonOpts = window.EJS_Buttons;
-    config.volume = window.EJS_volume;
-    config.defaultControllers = window.EJS_defaultControls;
-    config.startOnLoad = window.EJS_startOnLoaded;
-    config.fullscreenOnLoad = window.EJS_fullscreenOnLoaded;
-    config.filePaths = window.EJS_paths;
-    config.loadState = window.EJS_loadStateURL;
-    config.cacheLimit = window.EJS_CacheLimit;
-    config.cheats = window.EJS_cheats;
-    config.defaultOptions = window.EJS_defaultOptions;
-    config.gamePatchUrl = window.EJS_gamePatchUrl;
-    config.gameParentUrl = window.EJS_gameParentUrl;
-    config.netplayUrl = window.EJS_netplayServer;
-    config.gameId = window.EJS_gameID;
-    config.backgroundImg = window.EJS_backgroundImage;
-    config.backgroundBlur = window.EJS_backgroundBlur;
-    config.backgroundColor = window.EJS_backgroundColor;
-    config.controlScheme = window.EJS_controlScheme;
-    config.threads = window.EJS_threads;
-    config.disableCue = window.EJS_disableCue;
-    config.startBtnName = window.EJS_startButtonName;
-    config.softLoad = window.EJS_softLoad;
-    config.screenRecording = window.EJS_screenRecording;
-    
-    if (typeof window.EJS_language === "string" && window.EJS_language !== "en-US") {
-        try {
-            let path;
-            if ('undefined' != typeof EJS_paths && typeof EJS_paths[window.EJS_language] === 'string') {
-                path = EJS_paths[window.EJS_language];
-            } else {
-                path = scriptPath+"localization/"+window.EJS_language+".json";
+            scriptTag.parentNode.insertBefore(script, scriptTag);
+            script.onload = function() {
+                resolve();
             }
-            config.language = window.EJS_language;
-            config.langJson = JSON.parse(await (await fetch(path)).text());
-        } catch(e) {
-            config.langJson = {};
-        }
+        })
     }
-    
-    window.EJS_emulator = new EmulatorJS(EJS_player, config);
-    window.EJS_adBlocked = (url, del) => window.EJS_emulator.adBlocked(url, del);
-    if (typeof window.EJS_ready === "function") {
-        window.EJS_emulator.on("ready", window.EJS_ready);
+    if ('undefined' != typeof EJS_DEBUG_XX && true === EJS_DEBUG_XX) {
+        await loadScript('emu-main.js');
+        await loadScript('emulator.js');
+    } else {
+        await loadScript('emu-min.js');
     }
-    if (typeof window.EJS_onGameStart === "function") {
-        window.EJS_emulator.on("start", window.EJS_onGameStart);
-    }
-    if (typeof window.EJS_onLoadState === "function") {
-        window.EJS_emulator.on("load", window.EJS_onLoadState);
-    }
-    if (typeof window.EJS_onSaveState === "function") {
-        window.EJS_emulator.on("save", window.EJS_onSaveState);
-    }
+    var config = {};
+    config.gameUrl = EJS_gameUrl;
+    'undefined' != typeof EJS_mameCore && (config.mameCore = EJS_mameCore);
+    'undefined' != typeof EJS_biosUrl && (config.biosUrl = EJS_biosUrl);
+    'undefined' != typeof EJS_gameID && (config.gameId = EJS_gameID);
+    'undefined' != typeof EJS_gameParentUrl && (config.gameParentUrl = EJS_gameParentUrl);
+    'undefined' != typeof EJS_gamePatchUrl && (config.gamePatchUrl = EJS_gamePatchUrl);
+    'undefined' != typeof EJS_AdUrl && (config.adUrl = EJS_AdUrl);
+    'undefined' != typeof EJS_paths && (config.paths = EJS_paths);
+    'undefined' != typeof EJS_netplayUrl && (config.netplayUrl = EJS_netplayUrl);
+    'undefined' != typeof EJS_startOnLoaded && (config.startOnLoad = EJS_startOnLoaded);
+    'undefined' != typeof EJS_core && (config.system = EJS_core);
+    'undefined' != typeof EJS_loadStateURL && (config.loadStateOnStart = EJS_loadStateURL);
+    'undefined' != typeof EJS_language && (config.lang = EJS_language);
+    'undefined' != typeof EJS_oldEJSNetplayServer && (config.oldNetplayServer = EJS_oldEJSNetplayServer);
+    'undefined' != typeof EJS_BETA && (config.useBeta = EJS_BETA);
+    config.onsavestate = null;
+    config.onloadstate = null;
+    'undefined' != typeof EJS_onSaveState && (config.onsavestate = EJS_onSaveState);
+    'undefined' != typeof EJS_onLoadState && (config.onloadstate = EJS_onLoadState);
+    'undefined' != typeof EJS_lightgun && (config.lightgun = EJS_lightgun);
+    'undefined' != typeof EJS_gameName && (config.gameName = EJS_gameName);
+    'undefined' != typeof EJS_pathtodata && (config.dataPath = EJS_pathtodata);
+    'undefined' != typeof EJS_mouse && (config.mouse = EJS_mouse);
+    'undefined' != typeof EJS_multitap && (config.multitap = EJS_multitap);
+    'undefined' != typeof EJS_playerName && (config.playerName = EJS_playerName);
+    'undefined' != typeof EJS_cheats && (config.cheats = EJS_cheats);
+    'undefined' != typeof EJS_color && (config.color = EJS_color);
+    window.EJS_emulator = new EJS(EJS_player, config);
+    'undefined' != typeof EJS_onGameStart && EJS_emulator.on('start-game', EJS_onGameStart);
 })();
