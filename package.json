@@ -1,34 +1,12 @@
 {
-  "name": "tokyochat",
-  "version": "1.0.0",
-  "description": "Real time chat with socket.io and Node.js",
-  "main": "index.js",
+  "name": "EmulatorJS",
+  "version": "4.0.6",
+  "repository": "https://github.com/EmulatorJS/EmulatorJS.git",
+  "license": "GPL-3.0",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "http-server"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/franciscop/tokyochat.git"
-  },
-  "keywords": [
-    "chat",
-    "real",
-    "time",
-    "socket.io",
-    "tokyo",
-    "japan"
-  ],
-  "author": "Francisco Presencia <public@francisco.io> (https://francisco.io/)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/franciscop/tokyochat/issues"
-  },
-  "homepage": "https://github.com/franciscop/tokyochat#readme",
   "dependencies": {
-    "cookies": "^0.8.0",
-    "jquery": "^3.7.1",
-    "server": "^1.0.38",
-    "socket.io-client": "^4.7.2"
+    "http-server": "^14.1.1"
   }
 }
